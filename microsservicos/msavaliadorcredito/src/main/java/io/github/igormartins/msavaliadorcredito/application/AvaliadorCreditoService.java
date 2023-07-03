@@ -3,9 +3,11 @@ package io.github.igormartins.msavaliadorcredito.application;
 import feign.FeignException;
 import io.github.igormartins.msavaliadorcredito.application.ex.DadosClienteNotFoundException;
 import io.github.igormartins.msavaliadorcredito.application.ex.ErroComunicacaoMicrosservicesException;
+import io.github.igormartins.msavaliadorcredito.application.ex.ErroSolicitacaoCartaoException;
 import io.github.igormartins.msavaliadorcredito.domain.model.*;
 import io.github.igormartins.msavaliadorcredito.infra.clients.CartaoResourceClient;
 import io.github.igormartins.msavaliadorcredito.infra.clients.ClienteResourceClient;
+import io.github.igormartins.msavaliadorcredito.infra.mqueue.SolicitacaoEmissaoCartaoPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +24,7 @@ public class AvaliadorCreditoService {
 
     private final ClienteResourceClient clientesClient;
     private final CartaoResourceClient cartoesCLient;
+    private final SolicitacaoEmissaoCartaoPublisher emissaoCartaoPublisher;
 
     public SituacaoCliente obterSituacaoCliente(String cpf) throws DadosClienteNotFoundException, ErroComunicacaoMicrosservicesException{
 
@@ -77,6 +81,15 @@ public class AvaliadorCreditoService {
            }
            throw new ErroComunicacaoMicrosservicesException(e.getMessage(), status);
        }
+    }
 
+    public ProtocoloSolicitacaoCartao solicitarEmissaoCartao(DadosSolicitacaoEmissaoCartao dados){
+        try{
+            emissaoCartaoPublisher.solicitarCartao(dados);
+            var protocolo = UUID.randomUUID().toString();
+            return new ProtocoloSolicitacaoCartao(protocolo);
+        } catch(Exception e){
+            throw new ErroSolicitacaoCartaoException(e.getMessage());
+        }
     }
 }

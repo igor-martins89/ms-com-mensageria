@@ -35,7 +35,7 @@ public class CartaoResource {
     @GetMapping(params = "renda")
     public ResponseEntity<List<Cartao>> getCartoesRendaAte(@RequestParam("renda") Long renda){
         List<Cartao> lista = cartaoService.getCartoesRendaMenorIgual(renda);
-        return lista.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lista);
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping(params="cpf")

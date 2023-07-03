@@ -17,7 +17,7 @@ public class SolicitacaoEmissaoCartaoPublisher {
 
     public void solicitarCartao(DadosSolicitacaoEmissaoCartao dados) throws JsonProcessingException{
         var json = convertIntoJson(dados);
-        rabbitTemplate.convertAndSend(queueEmissaoCartoes.getActualName(), json);
+        rabbitTemplate.convertAndSend(queueEmissaoCartoes.getName(), json);
     }
 
     private String convertIntoJson(DadosSolicitacaoEmissaoCartao dados) throws JsonProcessingException{

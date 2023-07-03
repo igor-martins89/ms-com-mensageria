@@ -1,4 +1,4 @@
-package io.github.igormartins.msavaliadorcredito.domain.model;
+package io.github.igormartins.mscartoes.domain;
 
 import lombok.Data;
 
